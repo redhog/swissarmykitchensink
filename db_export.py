@@ -22,21 +22,38 @@
 
 import sys, csv
 
+if len(sys.argv) == 1:
+    print """
+Usage:
+
+db_export.py expr="select * from foo" > file.csv
+db_export.py expr="insert into foo (bar, fie) values(%(bar)s, %(fie)s)" < file.csv
+
+Other parameters:
+conn=psycopg2
+conn=pyPgSQL.PgSQL
+conn=MySQLdb
+
+Connection parameters (same name as to the connect() function of the
+respective driver:
+host=localhost
+user=username
+passwd=password
+db=dbname
+
+"""
+    sys.exit(0)
+
 args = dict([arg.split('=', 1) for arg in sys.argv[1:]])
 
 expr = args['expr']
 del args['expr']
 
-connector = "postgres"
+connector = "psycopg2"
 if "conn" in args:
     connector = args['conn']
     del args['conn']
 
-connectors = {
-    'mysql': 'MySQLdb',
-    'postgres': 'pyPgSQL.PgSQL'}
-
-connector = connectors.get(connector, connector)
 module = __import__(connector)
 for name in connector.split('.')[1:]:
     module = getattr(module, name)
