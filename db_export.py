@@ -64,6 +64,24 @@ cur = conn.cursor()
 
 writer = csv.writer(sys.stdout)
 
+def transform_to_csv(item):
+    if item is None:
+        return '__None__'
+    elif item is True:
+        return '__True__'
+    elif item is False:
+        return '__False__'
+    return item
+
+def transform_from_csv(item):
+    if item == '__None__':
+        return None
+    elif item == '__True__':
+        return True
+    elif item == '__False__':
+        return False
+    return item
+
 def execute(params = {}):
     cur.execute(expr, params)
     row = None
@@ -75,14 +93,14 @@ def execute(params = {}):
         cols = [dsc[0] for dsc in cur.description]
         writer.writerow(cols)
     while row:
-        writer.writerow(row)
+        writer.writerow([transform_to_csv(item) for item in row])
         row = cur.fetchone()
 
 if "%" in expr:
     reader = csv.reader(sys.stdin)
     columns = reader.next()
     for row in reader:
-        row = dict(zip(columns, row))
+        row = dict(zip([transform_from_csv(item) for item in columns], row))
         execute(row)
 else:
     execute()
