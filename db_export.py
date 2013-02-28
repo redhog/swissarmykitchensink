@@ -100,7 +100,7 @@ if "%" in expr:
     reader = csv.reader(sys.stdin)
     columns = reader.next()
     for row in reader:
-        row = dict(zip([transform_from_csv(item) for item in columns], row))
+        row = dict(zip(columns, [transform_from_csv(item) for item in row]))
         execute(row)
 else:
     execute()
