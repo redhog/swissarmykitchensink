@@ -10,6 +10,7 @@ Other parameters:
     conn=psycopg2
     conn=pyPgSQL.PgSQL
     conn=MySQLdb
+    format=kml
 
 Connection parameters (same name as to the connect() function of the respective driver:
 
