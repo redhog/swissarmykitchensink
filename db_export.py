@@ -1,6 +1,7 @@
 #! /usr/bin/env python
-# -*- coding: UTF-8 -*-
-# vim: set fileencoding=UTF-8 :
+# -*- coding: utf-8 -*-
+# vim: set fileencoding=utf-8 :
+# SETUPTOOLS_DO_NOT_WRAP
 
 # db_export database .csv-export/import script
 #
