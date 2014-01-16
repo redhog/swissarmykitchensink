@@ -19,7 +19,7 @@ def is_python_script(script_text, filename):
 easy_install.is_python_script = is_python_script
 
 setup(
-    name = "db_export",
+    name = "swissarmykitchensink",
     description = "Swiss army kitchen sink for all things to do with database queries and data conversion / editing from the command line.",
     keywords = "sql export csv kml csv json geojson",
     install_requires = ["Shapely>=1.2.18", "fastkml>=0.3dev", "geojson>=1.0.1", "jsonpath>=0.54"],
