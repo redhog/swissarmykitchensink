@@ -20,13 +20,13 @@ easy_install.is_python_script = is_python_script
 
 setup(
     name = "db_export",
-    description = "Swiss army kitchen sink for all things to do with database queries from the command line.",
-    keywords = "sql export csv kml",
-    install_requires = [],
-    version = "0.0.1",
+    description = "Swiss army kitchen sink for all things to do with database queries and data conversion / editing from the command line.",
+    keywords = "sql export csv kml csv json geojson",
+    install_requires = ["Shapely>=1.2.18", "fastkml>=0.3dev", "geojson>=1.0.1", "jsonpath>=0.54"],
+    version = "0.0.2",
     author = "Egil Moeller",
     author_email = "egil.moller@piratpartiet.se",
     license = "GPL",
-    url = "https://github.com/redhog/db_export",
-    scripts = ["db_export.py"]
+    url = "https://github.com/redhog/swissarmykitchensink",
+    scripts = ["db_export", "skyconvert", "jsonedit"]
 )
