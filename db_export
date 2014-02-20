@@ -5,6 +5,7 @@
 
 # db_export database .csv-export/import script
 #
+#  - Copyright (C) 2014 SkyTruth, Egil Moeller <egil@skytruth.org>
 #  - Copyright (C) 2013 Egil Moeller <egil.moller@piratpartiet.se>
 #  - Copyright (C) 2007 FreeCode AS, Egil Moeller <egil.moller@freecode.no>
 #
