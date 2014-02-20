@@ -81,18 +81,35 @@ Usage:
 
 db_export.py expr="select * from foo" > file.csv
 db_export.py expr="insert into foo (bar, fie) values(%(bar)s, %(fie)s)" < file.csv
+db_export.py expr="select * from foo order by bar, fie" out="data-%(bar)s.csv"
 
-Other parameters:
+Output parameter:
+out="mydata-%(foo)s-%(bar)s.csv"
+
+Output is written to multiple output files, named by the specified pattern with
+the current column values spliced in. Note: You must sort the data by the specified
+columns, before any other sorting. The behaviour is unspecified unless this
+sorting is applied.
+
+Connection parameter:
 conn=psycopg2
 conn=pyPgSQL.PgSQL
 conn=MySQLdb
 
 Connection parameters (same name as to the connect() function of the
 respective driver:
-host=localhost
-user=username
-passwd=password
-db=dbname
+
+conn=MySQLdb
+    host=localhost
+    user=username
+    passwd=password
+    db=dbname
+
+conn=psycopg2
+    host=localhost
+    user=scraper
+    password=password
+    database=dbname
 
 """
     sys.exit(0)
