@@ -133,6 +133,12 @@ module = __import__(connector)
 for name in connector.split('.')[1:]:
     module = getattr(module, name)
 
+for key, value in args.iteritems():
+    try:
+        args[key] = eval(value)
+    except:
+        pass
+
 conn = module.connect(**args)
 cur = conn.cursor()
 
