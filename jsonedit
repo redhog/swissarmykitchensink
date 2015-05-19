@@ -31,10 +31,13 @@ if len(sys.argv) < 4:
 
 For more information on jsonpaths see http://goessner.net/articles/JsonPath/
 
-There are three possible usages:
+There are four possible usages:
 
 jsonedit.py infile.json outfile.json '$..bbox'
     This will compile a list of all bbox attribute values
+
+jsonedit.py infile.json outfile.json '$..bbox' first
+    This will extract the first bbox attribute value
 
 jsonedit.py infile.json outfile.json '$..options' '{"layer": "47-11"}'
    This will replace all options attribute values with the json object {"layer": "47-11"}
@@ -45,9 +48,12 @@ jsonedit.py infile.json outfile.json '$..bbox' delete
     sys.exit(0)
 
 def main(input, output, query, replacement = None):
+    first = False
     delete = False
     replace = False
-    if replacement == 'delete':
+    if replacement == 'first':
+        first = True
+    elif replacement == 'delete':
         delete = True
     elif replacement:
         replace = True
@@ -69,6 +75,14 @@ def main(input, output, query, replacement = None):
                 obj[item] = replacement
     else:
         data = jsonpath.jsonpath(data, query)
+        if data is False:
+            data = []
+
+        if first:
+            if data:
+                data = data[0]
+            else:
+                data = None
 
     with open(output, "w") as f:
         json.dump(data, f)
