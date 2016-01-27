@@ -28,7 +28,7 @@ import sys
 
 class ToDelete(object): pass
 
-def main(query, replacement = None, delete=False, first=False, scalar=False, input=None, output=None):
+def main(query, replacement = None, delete=False, first=False, scalar=False, insert=False, input=None, output=None):
     if scalar: first=True
 
     replace = not not replacement
@@ -42,6 +42,9 @@ def main(query, replacement = None, delete=False, first=False, scalar=False, inp
             data = f.read()
     data = json.loads(data)
 
+    if insert is not False:
+        insert = int(insert)
+
     if replace or delete:
         for path in jsonpath.jsonpath(data, query, "path"):
             path, item = path.rsplit("[", 1)
@@ -53,6 +56,8 @@ def main(query, replacement = None, delete=False, first=False, scalar=False, inp
             obj = jsonpath.jsonpath(data, path)[0]
             if delete:
                 obj[item] = ToDelete
+            elif insert is not False:
+                obj[item + insert:item + insert] = [replacement]
             else:
                 obj[item] = replacement
         if delete:
@@ -115,6 +120,11 @@ OPTIONS:
 
     --delete
       Delete the matched value instead of raplacing it.
+
+    --insert=position
+      Inserts the replacement value at position relative to the
+      selected path (which should be an item in a list). Usefull
+      values are 0 (before) and 1 (after).
 
     --first
       Extract the first matched value, instead of a list of all
