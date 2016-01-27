@@ -53,7 +53,10 @@ def main(query, replacement = None, delete=False, first=False, scalar=False, ins
                 item = item[1:-1] # remove '' around strings
             else:
                 item = int(item)
-            obj = jsonpath.jsonpath(data, path)[0]
+            if path == '$':
+                obj = data
+            else:
+                obj = jsonpath.jsonpath(data, path)[0]
             if delete:
                 obj[item] = ToDelete
             elif insert is not False:

@@ -23,7 +23,7 @@ setup(
     description = "Swiss army kitchen sink for all things to do with database queries and data conversion / editing from the command line.",
     keywords = "sql export csv kml csv json geojson",
     install_requires = ["Shapely>=1.2.18", "fastkml>=0.3dev", "geojson>=1.0.1", "jsonpath>=0.54"],
-    version = "0.0.7",
+    version = "0.0.8",
     author = "Egil Moeller",
     author_email = "egil.moller@piratpartiet.se",
     license = "GPL",
