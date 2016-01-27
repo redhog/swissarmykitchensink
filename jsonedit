@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#!/home/redhog/Projects/skytruth/pelagos/deps/bin/python
 # -*- coding: utf-8 -*-
 # vim: set fileencoding=utf-8 :
 # SETUPTOOLS_DO_NOT_WRAP
@@ -31,13 +31,10 @@ if len(sys.argv) < 4:
 
 For more information on jsonpaths see http://goessner.net/articles/JsonPath/
 
-There are four possible usages:
+There are three possible usages:
 
 jsonedit.py infile.json outfile.json '$..bbox'
     This will compile a list of all bbox attribute values
-
-jsonedit.py infile.json outfile.json '$..bbox' first
-    This will extract the first bbox attribute value
 
 jsonedit.py infile.json outfile.json '$..options' '{"layer": "47-11"}'
    This will replace all options attribute values with the json object {"layer": "47-11"}
@@ -47,13 +44,13 @@ jsonedit.py infile.json outfile.json '$..bbox' delete
 """
     sys.exit(0)
 
+
+class ToDelete(object): pass
+
 def main(input, output, query, replacement = None):
-    first = False
     delete = False
     replace = False
-    if replacement == 'first':
-        first = True
-    elif replacement == 'delete':
+    if replacement == 'delete':
         delete = True
     elif replacement:
         replace = True
@@ -66,23 +63,33 @@ def main(input, output, query, replacement = None):
     if replace or delete:
         for path in jsonpath.jsonpath(data, query, "path"):
             path, item = path.rsplit("[", 1)
-            item = item[1:-2] # remove ' and ']
+            item = item[:-1] # remove ]
+            if item.startswith("'"):
+                item = item[1:-1] # remove '' around strings
+            else:
+                item = int(item)
             obj = jsonpath.jsonpath(data, path)[0]
-            if isinstance(obj, (list, tuple)): item = int(item)
             if delete:
-                del obj[item]
+                obj[item] = ToDelete
             else:
                 obj[item] = replacement
+        if delete:
+            def recursive_delete(obj):
+                if isinstance(obj, (list, tuple)):
+                    return [recursive_delete(item)
+                            for item in obj
+                            if item is not ToDelete]
+                elif isinstance(obj, dict):
+                    return {key: recursive_delete(value)
+                            for key, value in obj.iteritems()
+                            if value is not ToDelete}
+                elif obj is ToDelete:
+                    return None
+                else:
+                    return obj
+            data = recursive_delete(data)
     else:
         data = jsonpath.jsonpath(data, query)
-        if data is False:
-            data = []
-
-        if first:
-            if data:
-                data = data[0]
-            else:
-                data = None
 
     with open(output, "w") as f:
         json.dump(data, f)
