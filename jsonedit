@@ -57,7 +57,7 @@ def main(query, replacement = None, delete=False, first=False, scalar=False, ins
             if delete:
                 obj[item] = ToDelete
             elif insert is not False:
-                obj[item + insert:item + insert] = [replacement]
+                obj[item + insert:item + insert] = replacement
             else:
                 obj[item] = replacement
         if delete:
@@ -122,8 +122,8 @@ OPTIONS:
       Delete the matched value instead of raplacing it.
 
     --insert=position
-      Inserts the replacement value at position relative to the
-      selected path (which should be an item in a list). Usefull
+      Inserts a list (the replacement value) at a position relative to the
+      selected path, which should be an item in a list. Usefull
       values are 0 (before) and 1 (after).
 
     --first
