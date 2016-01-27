@@ -26,42 +26,20 @@ import json
 import jsonpath
 import sys
 
-if len(sys.argv) < 4:
-    print """Edits json files using jsonpaths
 
-For more information on jsonpaths see http://goessner.net/articles/JsonPath/
+def main(query, replacement = None, delete=False, first=False, scalar=False, input=None, output=None):
+    if scalar: first=True
 
-There are four possible usages:
-
-jsonedit.py infile.json outfile.json '$..bbox'
-    This will compile a list of all bbox attribute values
-
-jsonedit.py infile.json outfile.json '$..bbox' first
-    This will extract the first bbox attribute value
-
-jsonedit.py infile.json outfile.json '$..options' '{"layer": "47-11"}'
-   This will replace all options attribute values with the json object {"layer": "47-11"}
-
-jsonedit.py infile.json outfile.json '$..bbox' delete
-   This will delete all bbox attributes
-"""
-    sys.exit(0)
-
-def main(input, output, query, replacement = None):
-    first = False
-    delete = False
-    replace = False
-    if replacement == 'first':
-        first = True
-    elif replacement == 'delete':
-        delete = True
-    elif replacement:
-        replace = True
+    replace = not not replacement
+    if replacement:
         replacement = json.loads(replacement)
 
-
-    with open(input) as f:
-        data = json.load(f)
+    if input is None:
+        data = sys.stdin.read()
+    else:
+        with open(input) as f:
+            data = f.read()
+    data = json.loads(data)
 
     if replace or delete:
         for path in jsonpath.jsonpath(data, query, "path"):
@@ -84,7 +62,81 @@ def main(input, output, query, replacement = None):
             else:
                 data = None
 
-    with open(output, "w") as f:
-        json.dump(data, f)
+    if scalar and isinstance(data, (str, unicode, int, float)):
+        data = "%s" % (data,)
+    else:
+        data = json.dumps(data)
 
-main(*sys.argv[1:])
+    if output is None:
+        sys.stdout.write(data)
+    else:
+        with open(output, "w") as f:
+            f.write(data)
+
+
+args = []
+options = {}
+for arg in sys.argv[1:]:
+    if arg.startswith("--"):
+        arg = arg[2:]
+        if "=" in arg:
+            key, value = arg.split("=", 1)
+            options[key] = value
+        else:
+            options[arg] = True
+    else:
+        args.append(arg)
+
+if 'help' in options or len(args) < 1:
+    print """Edits json files using jsonpaths
+
+For more information on jsonpaths see http://goessner.net/articles/JsonPath/
+
+Usage: jsonedit.py [OPTIONS] QUERY [REPLACEMENT] < input.json > output.json
+
+QUERY is a JSONPath query
+REPLACEMENT is any JSON object
+
+If a replacement is suplied, the original document is returned, with
+any match replaced by the replacement object.
+
+OPTIONS:
+
+    --delete
+      Delete the matched value instead of raplacing it.
+
+    --first
+      Extract the first matched value, instead of a list of all
+      matched values.
+
+    --scalar
+      Do not encode a single returned string value as JSON, but rather
+      just print its value. Other types are not affected.
+
+    --input=filename
+      Read input from filename instead of stdin
+
+    --output=filename
+      Write output to filename instead of to stdout
+
+Examples:
+
+jsonedit.py '$..bbox' < infile.json > outfile.json 
+    This will compile a list of all bbox attribute values
+
+jsonedit.py --first '$..bbox' < infile.json > outfile.json 
+    This will extract the first bbox attribute value
+
+jsonedit.py --first --scalar '$..name' < infile.json > outfile.json 
+    This will extract the first name attribute value and print its (string) content
+
+jsonedit.py '$..options' '{"layer": "47-11"}' < infile.json > outfile.json
+   This will replace all options attribute values with the json object {"layer": "47-11"}
+
+jsonedit.py --delete '$..bbox' < infile.json > outfile.json
+   This will delete all bbox attributes
+"""
+    sys.exit(0)
+
+else:
+    main(*args, **options)
